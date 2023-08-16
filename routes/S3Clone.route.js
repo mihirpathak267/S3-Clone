@@ -1,8 +1,24 @@
 const fs = require('fs');
+const path = require('path');
 const auth = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 
+router.get('/getBuckets', auth.userAuth, async(req, res)=>{
+    const rootPath = path.join('rootFolder');
+
+    fs.readdir(rootPath, (err, buckets)=>{
+        const directories = buckets.filter((bucket)=>{
+            const filePath = path.join(rootPath, bucket);
+            return fs.statSync(filePath).isDirectory();
+        })
+        if (directories.length!==0){
+            return res.json({status: 200, success: directories});
+        } else if(directories.length==0){
+            return res.json({status: 404, message: "No Buckets found"});
+        }
+    })
+})
 router.post('/createBucket', auth.userAuth, async(req, res)=>{
     const folderName = req.body.folderName;
     if (!folderName){
@@ -26,6 +42,6 @@ router.post('/createBucket', auth.userAuth, async(req, res)=>{
         console.log(error);
     }
 
-})
+});
 
 module.exports = router;
