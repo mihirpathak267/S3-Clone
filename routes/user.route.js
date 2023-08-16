@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../model/user.model');
+const auth = require('../middleware/auth');
 const crypto = require('crypto-js');
 
 router.post('/register', async(req, res)=>{
@@ -18,7 +19,17 @@ router.post('/register', async(req, res)=>{
         } catch (error){
             console.log(error);
         }
-    });
+});
+
+router.post('/login', auth.userAuth, async(req, res)=>{
+    try{
+        if (req.user){
+            res.json({status:200, success:req.user})
+        }
+    } catch (error){
+        console.log(error)
+    }
+});
 
 module.exports = router;
 
