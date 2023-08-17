@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const auth = require('../middleware/auth');
+const { upload } = require('../middleware/multer');
 const express = require('express');
 const router = express.Router();
 
@@ -43,5 +44,10 @@ router.post('/createBucket', auth.userAuth, async(req, res)=>{
     }
 
 });
+router.post('/upload', auth.userAuth, upload().single('file'), (req, res)=>{
+    if (req.file){
+        return res.json({status: 200, success: "File uploaded successfully"});
+    }
+})
 
 module.exports = router;
