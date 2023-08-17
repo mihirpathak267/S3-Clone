@@ -10,7 +10,7 @@ const uploadsSchema = new mongoose.Schema({
     filename: {
         type: String
     },
-    mimeType: {
+    mimetype: {
         type: String
     },
     path: {

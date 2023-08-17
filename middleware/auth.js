@@ -35,7 +35,7 @@ exports.userAuth = async(req, res, next)=>{
     if(!getUser){
         return res.json({status:400, message:"Apikey doesnt exist"})
     }
-
+    console.log(req.user);
     req.user = getUser;
     next();
 

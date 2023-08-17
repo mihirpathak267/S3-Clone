@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const auth = require('../middleware/auth');
 const { upload } = require('../middleware/multer');
+const Uploads = require('../model/uploads.model');
 const express = require('express');
 const router = express.Router();
 
@@ -44,8 +45,19 @@ router.post('/createBucket', auth.userAuth, async(req, res)=>{
     }
 
 });
-router.post('/upload', auth.userAuth, upload().single('file'), (req, res)=>{
+router.post('/upload', auth.userAuth, upload().single('file'), async(req, res)=>{
     if (req.file){
+        console.log(req.file);
+        const fullpath = req.file.destination + req.file.filename;
+        const uploadData = new Uploads({
+            userId: req.user._id,
+            filename: req.file.filename,
+            mimetype: req.file.mimetype,
+            path: fullpath
+
+            
+        })
+        await uploadData.save();
         return res.json({status: 200, success: "File uploaded successfully"});
     }
 })
