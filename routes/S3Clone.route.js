@@ -49,6 +49,17 @@ router.get('/getFiles', auth.userAuth, async(req, res)=>{
     }
 })
 
+router.get('/downloadFile/:folderName/:fileName', auth.userAuth, async(req, res)=>{
+    const { folderName, fileName } = req.params;
+    const filePath = `rootFolder/${folderName}/${fileName}`;
+    if (!fs.existsSync(filePath)){
+        return res.json({status: false, message: "Bucket name or file name invalid"});
+    }
+    res.setHeader('Content-Dispostion', `attachment; filename=${fileName}`);
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+})
+
 router.post('/createBucket', auth.userAuth, async(req, res)=>{
     const folderName = req.body.folderName;
     if (!folderName){
@@ -90,5 +101,28 @@ router.post('/upload', auth.userAuth, upload().single('file'), async(req, res)=>
         return res.json({status: 200, success: "File uploaded successfully"});
     }
 })
+
+router.delete('/deleteFile/:folderName/:fileName', auth.userAuth, async(req, res)=>{
+    const { folderName, fileName } = req.params;
+    if (!folderName || !fileName){
+        return res.json({status: false, message: "Folder or File name not provided"});
+    }
+    const filePath = `rootFolder/${folderName}/${fileName}`;
+    if(!fs.existsSync(filePath)){
+        return res.json({status: false, message: "File does not exist"});
+    }
+    try {
+        fs.unlink(filePath, (err)=>{
+            console.log(err);
+        })
+        return res.json({message:"File deleted succesfully"});
+    } catch (error) {
+        console.log(error);
+    }
+
+
+})
+
+
 
 module.exports = router;
